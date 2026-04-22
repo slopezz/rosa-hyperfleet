@@ -1,4 +1,4 @@
-# rosa-regional-platform
+ # rosa-regional-platform
 
 For the full architecture overview, see [docs/README.md](docs/README.md).
 
