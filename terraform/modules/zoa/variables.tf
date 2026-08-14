@@ -62,6 +62,6 @@ variable "zoa_runner_source_image" {
 variable "zoa_image_tag" {
   description = "Immutable image tag (git SHA). Used for source→ECR mirroring and runner image ref."
   type        = string
-  default     = "0c3ca66"
+  default     = "b4a76b0"
 }
 
