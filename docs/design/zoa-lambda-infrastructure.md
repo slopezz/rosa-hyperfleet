@@ -1,6 +1,6 @@
 # ZOA Lambda Infrastructure
 
-**Last Updated Date**: 2026-08-19
+**Last Updated Date**: 2026-08-20
 
 ## Summary
 
@@ -12,10 +12,10 @@ ZOA uses a **2-Lambda per VPC** model:
 
 | Lambda     | Trigger                             | Purpose                                              | Timeout | Concurrency |
 | ---------- | ----------------------------------- | ---------------------------------------------------- | ------- | ----------- |
-| **API**    | Function URL (IAM auth) + LWA       | CLI requests, sync TA execution, streaming downloads | 300s    | 50          |
+| **API**    | Function URL (IAM auth, streaming)  | CLI requests, sync TA execution, streaming downloads | 300s    | 50          |
 | **Worker** | EventBridge Scheduler + self-invoke | Reconciler, GC, async TA execution                   | 300s    | 10          |
 
-Both share the same container image (ECR), IAM execution role, and binary. `HANDLER_MODE` env var selects the execution path (API starts HTTP server behind LWA; Worker calls `lambda.Start()` for native event handling).
+Both share the same container image (ECR), IAM execution role, and binary. `HANDLER_MODE` env var selects the execution path (API uses native Go streaming via `LambdaFunctionURLStreamingResponse`; Worker calls `lambda.Start()` for native event handling).
 
 ## Terraform Module Split
 
@@ -73,14 +73,10 @@ All timeouts and batch sizes are **configurable without code change** via Terraf
 
 **API Lambda only:**
 
-| Env Var                        | Set from                    | Controls                            |
-| ------------------------------ | --------------------------- | ----------------------------------- |
-| `HANDLER_MODE`                 | `"api"` (fixed)             | Starts HTTP server on :8080         |
-| `AWS_LWA_PORT`                 | `"8080"` (fixed)            | LWA sidecar target port             |
-| `AWS_LWA_READINESS_CHECK_PATH` | `"/health"` (fixed)         | LWA health check path               |
-| `AWS_LWA_INVOKE_MODE`          | `"response_stream"` (fixed) | LWA streaming mode                  |
-| `AWS_LAMBDA_EXEC_WRAPPER`      | LWA extension path (fixed)  | Activates LWA sidecar               |
-| `EXECUTION_DEADLINE_SECONDS`   | `lambda_api_timeout - 5`    | Code deadline for sync TA execution |
+| Env Var                      | Set from                 | Controls                                        |
+| ---------------------------- | ------------------------ | ----------------------------------------------- |
+| `HANDLER_MODE`               | `"api"` (fixed)          | Native Go streaming handler (Function URL)      |
+| `EXECUTION_DEADLINE_SECONDS` | `lambda_api_timeout - 5` | Code deadline for sync TA execution             |
 
 **Worker Lambda only:**
 
