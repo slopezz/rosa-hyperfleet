@@ -6,7 +6,7 @@
 # to the cluster in that VPC — no cross-VPC or cross-account K8s API calls.
 #
 # Architecture (2 Lambdas per VPC):
-#   - API Lambda: Function URL with LWA for response streaming. Handles CLI
+#   - API Lambda: Function URL with native Go streaming. Handles CLI
 #     requests and sync auto-approved TA execution.
 #   - Worker Lambda: Standard handler. Handles all scheduled work (reconciler,
 #     GC) and async TA execution via self-invocation from reconciler.
@@ -401,7 +401,7 @@ resource "aws_sqs_queue" "dlq" {
 }
 
 # -----------------------------------------------------------------------------
-# Lambda: ZOA API (Function URL with IAM auth, response streaming via LWA)
+# Lambda: ZOA API (Function URL with IAM auth, native response streaming)
 # -----------------------------------------------------------------------------
 # Handles all CLI requests:
 #   - POST /run → sync auto-approved TAs execute here directly
@@ -410,8 +410,8 @@ resource "aws_sqs_queue" "dlq" {
 #   - GET /runs/{id}/logs → streaming download from S3
 #   - GET /audit → audit log
 #
-# Uses Lambda Web Adapter (LWA) to run a standard Go HTTP server, enabling
-# RESPONSE_STREAM mode on the Function URL for downloads >6MB.
+# Uses native Go Lambda streaming (LambdaFunctionURLStreamingResponse) via
+# the aws-lambda-go SDK. RESPONSE_STREAM on the Function URL enables downloads >6MB.
 
 resource "aws_lambda_function" "api" {
   function_name = "${local.function_prefix}-api"
@@ -436,12 +436,8 @@ resource "aws_lambda_function" "api" {
 
   environment {
     variables = merge(local.common_env, {
-      HANDLER_MODE                 = "api"
-      AWS_LWA_PORT                 = "8080"
-      AWS_LWA_READINESS_CHECK_PATH = "/health"
-      AWS_LWA_INVOKE_MODE          = "response_stream"
-      AWS_LAMBDA_EXEC_WRAPPER      = "/opt/extensions/lambda-adapter"
-      EXECUTION_DEADLINE_SECONDS   = tostring(var.lambda_api_timeout - 5)
+      HANDLER_MODE               = "api"
+      EXECUTION_DEADLINE_SECONDS = tostring(var.lambda_api_timeout - 5)
     })
   }
 

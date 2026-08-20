@@ -6,7 +6,7 @@ Deploys ZOA Lambda functions (API + Worker) into a target VPC with direct EKS AP
 
 Two Lambda functions per deployment:
 
-- **API Lambda** — Function URL with LWA for response streaming. Handles CLI requests and sync TA execution.
+- **API Lambda** — Function URL with native Go streaming. Handles CLI requests and sync TA execution.
 - **Worker Lambda** — Standard handler. Handles reconciler, GC, reaper (EventBridge-scheduled) and async TA execution (self-invoked from reconciler).
 
 ## Usage
