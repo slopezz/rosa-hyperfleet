@@ -19,6 +19,3 @@ hypershift:
     region: us-east-1
   externalDns:
     domain: us-east-1.int0.rosa.devshift.net
-cloudwatch-exporter:
-  prometheus-yet-another-cloudwatch-exporter:
-    recentlyActiveOnly: false

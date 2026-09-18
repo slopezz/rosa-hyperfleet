@@ -3,14 +3,10 @@
   Helm template rendering inside metricRelabelings (the subchart uses toYaml,
   not tpl, so .Values.global.cluster_name is inaccessible there).
 
-  Always drops aws_zoa_* metrics whose dimension_Cluster doesn't match the
-  current cluster.  In shared AWS accounts (ephemeral) this prevents cross-
-  cluster ZOA EMF pollution; in isolated accounts (int/stage/prod) every
-  dimension_Cluster already matches, so the rules are harmless no-ops.
-
-  The 2-step mark-then-drop pattern works around RE2's lack of negative
-  lookahead.  Temporary __tmp_* labels are automatically stripped before
-  storage by the Prometheus scrape pipeline.
+  In ephemeral environments (shared AWS accounts), drops aws_zoa_* metrics
+  whose dimension_Cluster doesn't match the current cluster. This prevents
+  cross-cluster ZOA EMF pollution. In isolated accounts (int/stage/prod),
+  no filtering is applied because every cluster has its own AWS account.
 */}}
 {{- if .Values.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
@@ -28,11 +24,12 @@ spec:
       interval: {{ .Values.serviceMonitor.interval }}
       metricRelabelings:
         {{- toYaml .Values.serviceMonitor.metricRelabelings | nindent 8 }}
+        {{- if eq .Values.global.environment "ephemeral" }}
         # Drop aws_zoa_* metrics from other clusters.
-        # In shared AWS accounts (ephemeral), YACE's customNamespace job scrapes
-        # all ZOA EMF metrics account-wide because customNamespace has no tag-based
-        # filtering.  In isolated accounts (int/stage/prod), dimension_Cluster
-        # always matches so these rules are harmless no-ops.
+        # YACE's customNamespace job scrapes all ZOA EMF metrics account-wide
+        # because customNamespace has no tag-based filtering. In shared AWS
+        # accounts (ephemeral), multiple clusters share one account, so we
+        # filter at scrape time.
         #
         # 2-step mark-then-drop works around RE2's lack of negative lookahead.
         # Temporary __tmp_* labels are stripped automatically before storage.
@@ -44,6 +41,7 @@ spec:
         - sourceLabels: [__name__, __tmp_zoa_mine]
           regex: aws_zoa_.+;
           action: drop
+        {{- end }}
   jobLabel: cloudwatch-exporter
   namespaceSelector:
     matchNames:

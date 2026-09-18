@@ -281,7 +281,7 @@ terraform apply → updates Lambda functions and K8s Job runner to use new image
 
 **Rollback**: Set `zoa_lambda_image_tag` (and/or `zoa_runner_image_tag`) to a previous commit SHA and `terraform apply`. Lambda picks up the ECR image immediately on next cold start. No draining, no rolling update — existing warm instances continue until their next invocation timeout.
 
-## Monitoring
+## Observability
 
 | Signal                   | Source               | Status    | How                                                                                          |
 | ------------------------ | -------------------- | --------- | -------------------------------------------------------------------------------------------- |
@@ -295,9 +295,17 @@ terraform apply → updates Lambda functions and K8s Job runner to use new image
 | CW Exporter → Prometheus | YACE on RC + MC      | Available | Discovery: `AWS/Lambda`, `AWS/SQS`; top-level `customNamespace` job for `ZOA`                |
 | PrometheusRules alerting | Thanos Ruler (RC)    | Available | `alerting-rules/templates/zoa.yaml` — DLQ, worker errors, reconciler heartbeat, TA/API rates |
 
-Grafana: **Lambda** (infra) and **ZOA** (unified service dashboard). Starting SLOs: API availability 99%/30d, TA success 95%/7d, DLQ depth 0. Tune after baseline.
+Two Grafana dashboards: **Lambda** (infrastructure) and **ZOA** (unified service view with SLO panels, activity breakdowns, per-TA drill-down, and worker pipeline health).
 
-Reconciler “not running” is `time() - ReconcilerLastRun` (unix seconds emitted every tick). That avoids Helm loops over MCs and does not use Prometheus `timestamp()` on YACE scrapes (those timestamps stay fresh even when Invocations=0).
+### Source of Truth
+
+| What                         | Location                                                                                                                                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Recording rules and alerts   | [`alerting-rules/templates/zoa.yaml`](https://github.com/openshift-online/rosa-hyperfleet/blob/main/argocd/config/regional-cluster/alerting-rules/templates/zoa.yaml)                      |
+| Dashboard                    | [`grafana/dashboards/zoa/zoa.json`](https://github.com/openshift-online/rosa-hyperfleet/blob/main/argocd/config/regional-cluster/grafana/dashboards/zoa/zoa.json)                          |
+| YACE scrape config (RC)      | [`cloudwatch-exporter/values.yaml` (RC)](https://github.com/openshift-online/rosa-hyperfleet/blob/main/argocd/config/regional-cluster/cloudwatch-exporter/values.yaml)                     |
+| YACE scrape config (MC)      | [`cloudwatch-exporter/values.yaml` (MC)](https://github.com/openshift-online/rosa-hyperfleet/blob/main/argocd/config/management-cluster/cloudwatch-exporter/values.yaml)                   |
+| EMF metrics catalog and logs | [ZOA observability docs](https://github.com/openshift-online/rosa-hyperfleet-zoa/blob/main/docs/observability.md)                                                                          |
 
 ## Cost
 
@@ -416,3 +424,7 @@ ZOA CLI will run from a `rosa-boundary` ECS Fargate container — a pre-authenti
 - [CLI Reference](https://github.com/openshift-online/rosa-hyperfleet-zoa/blob/main/docs/cli-reference.md) — All `zoa` CLI commands, flags, and usage examples
 - [Trusted Actions Guide](https://github.com/openshift-online/rosa-hyperfleet-zoa/blob/main/docs/trusted-actions.md) — TA template format, CLI commands, API endpoints
 - [Development Guide](https://github.com/openshift-online/rosa-hyperfleet-zoa/blob/main/docs/development.md) — Building, testing, local development
+- [E2E Testing](https://github.com/openshift-online/rosa-hyperfleet-zoa/blob/main/docs/e2e-testing.md) — Functional and monitoring E2E suites, smoke vs full, CI integration
+- [Observability](https://github.com/openshift-online/rosa-hyperfleet-zoa/blob/main/docs/observability.md) — EMF metrics catalog, cost model, Lambda logs, Grafana Explorer
+- [API Reference](https://github.com/openshift-online/rosa-hyperfleet-zoa/blob/main/docs/api-reference.md) — Lambda Function URL HTTP API endpoints
+- [Konflux](https://github.com/openshift-online/rosa-hyperfleet-zoa/blob/main/docs/konflux.md) — Container image build pipeline

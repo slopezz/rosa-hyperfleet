@@ -170,10 +170,6 @@ management_cluster_defaults:
   node_instance_families: ["m8i-flex", "m7i-flex"]
 
 observability:
-  cloudwatch:
-    # @doc observability.cloudwatch.recently_active_only When true, YACE customNamespace jobs use recentlyActiveOnly (PT3H) to skip stale metrics from torn-down clusters in shared AWS accounts.
-    # @used-by observability.cloudwatch.recently_active_only _context
-    recently_active_only: true
   pagerduty:
     # @doc observability.pagerduty.enabled Enable PagerDuty service provisioning for the region.
     # @used-by observability.pagerduty.enabled _context
@@ -219,12 +215,6 @@ applications:
         # @doc applications.management-cluster.hypershift.externalDns.domain External DNS domain filter for HyperShift. Should match the regional zone so external-dns discovers zone shards.
         # @used-by applications.management-cluster.hypershift.externalDns.domain _context
         domain: "{% if dns.domain %}{{ deployment_name }}.{{ dns.domain }}{% endif %}"
-    cloudwatch-exporter:
-      # @doc applications.management-cluster.cloudwatch-exporter CloudWatch exporter (YACE) settings passed as Helm values.
-      prometheus-yet-another-cloudwatch-exporter:
-        # @doc applications.management-cluster.cloudwatch-exporter.recentlyActiveOnly Limit YACE customNamespace ListMetrics to recently-active metrics (PT3H). Reduces cost in shared AWS accounts.
-        # @used-by applications.management-cluster.cloudwatch-exporter.recentlyActiveOnly argocd/config/management-cluster/cloudwatch-exporter/values.yaml
-        recentlyActiveOnly: "{{ observability.cloudwatch.recently_active_only | default(false) }}"
   regional-cluster:
     eksNodePool:
       # @doc applications.regional-cluster.eksNodePool.instanceFamilies Instance families for the regional Karpenter NodePool.
@@ -256,12 +246,6 @@ applications:
       # @doc applications.regional-cluster.pagerduty.enabled Enable PagerDuty alerting in the monitoring stack.
       # @used-by applications.regional-cluster.pagerduty.enabled _context
       enabled: "{{ observability.pagerduty.enabled | default(false) }}"
-    cloudwatch-exporter:
-      # @doc applications.regional-cluster.cloudwatch-exporter CloudWatch exporter (YACE) settings passed as Helm values.
-      prometheus-yet-another-cloudwatch-exporter:
-        # @doc applications.regional-cluster.cloudwatch-exporter.recentlyActiveOnly Limit YACE customNamespace ListMetrics to recently-active metrics (PT3H). Reduces cost in shared AWS accounts.
-        # @used-by applications.regional-cluster.cloudwatch-exporter.recentlyActiveOnly argocd/config/regional-cluster/cloudwatch-exporter/values.yaml
-        recentlyActiveOnly: "{{ observability.cloudwatch.recently_active_only | default(false) }}"
     grafana:
       # @doc applications.regional-cluster.grafana Grafana auth mode driven by enable_write_sre_tools. Viewer when false (default), Admin when true (ephemeral only).
       # @used-by applications.regional-cluster.grafana _context

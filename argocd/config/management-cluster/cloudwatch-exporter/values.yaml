@@ -1,3 +1,7 @@
+global:
+  environment: ""
+  cluster_name: ""
+
 prometheus-yet-another-cloudwatch-exporter:
   fullnameOverride: cloudwatch-exporter
 
@@ -112,7 +116,7 @@ prometheus-yet-another-cloudwatch-exporter:
         namespace: ZOA
         regions:
           - {{ .Values.global.aws_region }}
-        recentlyActiveOnly: {{ .Values.recentlyActiveOnly | default false }}
+        recentlyActiveOnly: {{ eq .Values.global.environment "ephemeral" }}
         period: 120
         length: 120
         delay: 120

@@ -52,7 +52,5 @@ management_cluster_defaults:
   node_instance_families: ["m8i-flex", "m7i-flex"]
 
 observability:
-  cloudwatch:
-    recently_active_only: true
   pagerduty:
     enabled: false
