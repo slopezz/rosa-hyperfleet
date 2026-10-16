@@ -44,5 +44,6 @@
   "zoa_access_trusted_assumer_role_names": ["OrganizationAccountAccessRole"],
   "worker_node_ami_id": "ami-056d5e72aa5cf51f1",
   "worker_node_root_volume_size": 50,
-  "management_clusters_info": [{"account_id": "855246887846", "id": "eph-3cfd072c-mc01"}]
+  "management_clusters_info": [{"account_id": "855246887846", "id": "eph-3cfd072c-mc01"}],
+  "delete": true
 }

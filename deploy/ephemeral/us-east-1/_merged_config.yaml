@@ -314,4 +314,6 @@ applications:
 # Per-region fields: Can be overridden at region level in <env>/<region>.yaml
 # These are now part of the regional_cluster stanza above.
 provision_mcs:
-  mc01: {}
+  mc01:
+    delete: true
+delete: true
