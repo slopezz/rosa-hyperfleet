@@ -4,9 +4,9 @@
   "service_phase": "dev",
   "cost_center": "000",
   "environment": "ephemeral",
-  "account_id": "ssm:///infra/ephemeral/us-east-1/account_id",
+  "account_id": "599476212575",
   "region": "us-east-1",
-  "deployment_name": "us-east-1",
+  "deployment_name": "us-east-1-eph-3cfd072c",
   "alias": "regional-us-east-1",
   "enable_bastion": true,
   "enable_cloudtrail": false,
@@ -26,8 +26,8 @@
   "sre_prometheus_oidc_client_id": "",
   "sre_thanos_oidc_client_id": "",
   "environment_domain": "dev0.rosa.devshift.net",
-  "regional_id": "regional",
-  "eph_prefix": "",
+  "regional_id": "eph-3cfd072c-regional",
+  "eph_prefix": "eph-3cfd072c",
   "hyperfleet_db_instance_class": "db.t4g.medium",
   "hyperfleet_db_deletion_protection": false,
   "hyperfleet_db_skip_final_snapshot": true,
@@ -44,5 +44,5 @@
   "zoa_access_trusted_assumer_role_names": ["OrganizationAccountAccessRole"],
   "worker_node_ami_id": "ami-056d5e72aa5cf51f1",
   "worker_node_root_volume_size": 50,
-  "management_clusters_info": [{"account_id": "ssm:///infra/ephemeral/us-east-1/mc01/account_id", "id": "mc01"}]
+  "management_clusters_info": [{"account_id": "855246887846", "id": "eph-3cfd072c-mc01"}]
 }

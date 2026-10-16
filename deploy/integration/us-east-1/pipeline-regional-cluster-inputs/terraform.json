@@ -26,8 +26,8 @@
   "sre_prometheus_oidc_client_id": "rrp-prometheus-sre-int-us-east-1",
   "sre_thanos_oidc_client_id": "rrp-thanos-sre-int-us-east-1",
   "environment_domain": "int0.rosa.devshift.net",
-  "regional_id": "regional",
-  "eph_prefix": "",
+  "regional_id": "eph-3cfd072c-regional",
+  "eph_prefix": "eph-3cfd072c",
   "hyperfleet_db_instance_class": "db.r6g.large",
   "hyperfleet_db_deletion_protection": true,
   "hyperfleet_db_skip_final_snapshot": false,
@@ -44,5 +44,5 @@
   "zoa_access_trusted_assumer_role_names": ["OrganizationAccountAccessRole"],
   "worker_node_ami_id": "ami-056d5e72aa5cf51f1",
   "worker_node_root_volume_size": 50,
-  "management_clusters_info": [{"account_id": "ssm:///infra/integration/us-east-1/mc01/account_id", "id": "mc01"}]
+  "management_clusters_info": [{"account_id": "ssm:///infra/integration/us-east-1/mc01/account_id", "id": "eph-3cfd072c-mc01"}]
 }
