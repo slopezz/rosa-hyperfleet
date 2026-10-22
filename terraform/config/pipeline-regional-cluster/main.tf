@@ -104,6 +104,16 @@ resource "aws_iam_role_policy" "codebuild_policy" {
         Resource = local.zoa_central_deployments_ssm_parameter_arns
       },
       {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+        ]
+        Resource = [
+          "arn:aws:ssm:*:${data.aws_caller_identity.current.account_id}:parameter/infra/*"
+        ]
+      },
+      {
         Effect   = "Allow"
         Action   = ["ssm:DescribeParameters"]
         Resource = "*"

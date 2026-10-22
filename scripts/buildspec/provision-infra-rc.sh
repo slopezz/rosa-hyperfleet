@@ -32,6 +32,10 @@ if [ "$_RAW_PD" == "true" ] || [ "$_RAW_PD" == "1" ]; then
     export PAGERDUTY_TOKEN
 fi
 
+# Resolve MC account IDs from central /infra/* while ambient creds are still the CodeBuild (central) role.
+export TF_VAR_management_clusters
+TF_VAR_management_clusters=$(build_management_clusters_tf_var "$DEPLOY_CONFIG_FILE")
+
 use_mc_account
 
 # Configure Terraform backend (state in target account)
@@ -50,10 +54,6 @@ export TF_VAR_cost_center="${COST_CENTER}"
 _REPO_BRANCH="${REPOSITORY_BRANCH:-main}"
 export TF_VAR_repository_url="${REPOSITORY_URL}"
 export TF_VAR_repository_branch="${_REPO_BRANCH}"
-
-# Same Terraform variable for all environments; see build_management_clusters_tf_var in lib.sh.
-export TF_VAR_management_clusters
-TF_VAR_management_clusters=$(build_management_clusters_tf_var "$DEPLOY_CONFIG_FILE")
 
 if [ -z "${PLATFORM_IMAGE:-}" ]; then
     echo "ERROR: PLATFORM_IMAGE is not set" >&2

@@ -122,7 +122,8 @@ _resolve_rc_account() {
 #   Static (integration, stage, production, …):
 #     render.py leaves account_id as ssm:///infra/<env>/<region>/<mc>/account_id
 #     in pipeline-regional-cluster-inputs/terraform.json. Values live in the
-#     central pipeline account; resolve here at apply time.
+#     central pipeline account; provision-infra-rc.sh resolves before assume-role
+#     (get_central_ssm_parameter also works after assume into RC).
 #
 #   Ephemeral:
 #     ci/ephemeral-provider (or local dev) injects literal 12-digit account IDs
@@ -147,7 +148,7 @@ resolve_management_cluster_account_id() {
 
     if [[ "$raw_account_id" =~ ^ssm:// ]]; then
         local ssm_param="${raw_account_id#ssm://}"
-        get_central_ssm_parameter "$ssm_param" 2>/dev/null || true
+        get_central_ssm_parameter "$ssm_param"
         return 0
     fi
 
