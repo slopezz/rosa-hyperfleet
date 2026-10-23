@@ -45,6 +45,7 @@ aws:
   # @used-by aws.zoa_access_trusted_assumer_role_names _context
   zoa_access_trusted_assumer_role_names:
   - OrganizationAccountAccessRole
+  - 791666871613-rosa-seaplane-zoa-operator-dev
 
 
 dns:

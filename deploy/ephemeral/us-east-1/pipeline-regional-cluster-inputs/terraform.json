@@ -44,7 +44,7 @@
   "zoa_lambda_api_concurrency": -1,
   "zoa_lambda_worker_concurrency": -1,
   "zoa_lambda_access_concurrency": -1,
-  "zoa_access_trusted_assumer_role_names": ["OrganizationAccountAccessRole"],
+  "zoa_access_trusted_assumer_role_names": ["OrganizationAccountAccessRole", "791666871613-rosa-seaplane-zoa-operator-dev"],
   "worker_node_ami_id": "ami-056d5e72aa5cf51f1",
   "worker_node_root_volume_size": 50,
   "management_clusters_info": [{"account_id": "ssm:///infra/ephemeral/us-east-1/mc01/account_id", "id": "mc01"}]

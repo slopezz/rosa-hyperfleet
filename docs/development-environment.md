@@ -315,6 +315,20 @@ make ephemeral-zoa-e2e-smoke ID=6bd2d3d7 ZOA_REF=my-branch ZOA_REPO=https://gith
 
 These targets exercise the Lambdas already deployed in the environment; they do not rebuild or redeploy ZOA images. Test suite details: [`rosa-seaplane-zoa/docs/e2e-testing.md`](https://github.com/openshift-online/rosa-seaplane-zoa/blob/main/docs/e2e-testing.md).
 
+#### ZOA CLI from your laptop (SAML)
+
+`zoa deployments` reads Central SSM in **rrp-dev-control** (`791666871613`). `zoa targets` and `zoa session` then **assume** the deployment’s `*-zoa-access-invoker` role in the RC account. That invoker role trusts only IAM role names listed in `aws.zoa_access_trusted_assumer_role_names` for ephemeral (see `config/ephemeral/defaults.yaml`), including the SAML hub role `791666871613-rosa-seaplane-zoa-operator-dev`.
+
+Login (Kerberos + SAML):
+
+```bash
+rh-aws-saml-login rrp-central-dev/791666871613-rosa-seaplane-zoa-operator-dev
+```
+
+**Existing** ephemeral environments keep the invoker trust policy from their last RC Terraform apply. After changing `zoa_access_trusted_assumer_role_names`, re-apply RC infra for that environment (e.g. `make ephemeral-resync` / pipeline RC provision) before `zoa targets` will succeed.
+
+App-interface must grant `RosaSeaplaneZoaOperatorInvokerAccess` on the SAML role (`rosa-seaplane-zoa-operator-dev`) so your identity may call `sts:AssumeRole` on `*-zoa-access-invoker` in the dev OU.
+
 ## Dump Environment
 
 Collect Kubernetes diagnostic logs (`oc adm inspect`) and PostgreSQL database state from the RC and/or MC clusters in an ephemeral environment. Data is gathered by the log-collector ECS Fargate task, uploaded to S3, and downloaded locally.

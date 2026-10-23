@@ -176,35 +176,42 @@ Components that deploy through **Terraform** (not ArgoCD Helm) and/or have **mul
 
 | Aspect          | Standard (API)                         | Terraform (ZOA)                                   |
 | --------------- | -------------------------------------- | ------------------------------------------------- |
-| Image count     | 1 (or 2 for API)                       | 2 (Lambda + Runner)                               |
+| Image count     | 1 (or 2 for API)                       | 3 (Lambda + Runner + Boundary)                    |
 | Override target | `argocd/config/.../values.yaml` (Helm) | `config/defaults.yaml` (Terraform via render.py)  |
-| Image push step | `rosa-seaplane-image-push` (shared)    | Same step — uses `ROSA_REGIONAL_EXTRA_COMPONENTS` |
+| Image push step | `rosa-seaplane-image-push` (shared)    | Same step — uses `ROSA_REGIONAL_COMPONENTS`       |
 | Placeholders    | `IMAGE_REPO`, `IMAGE_TAG`              | `IMAGE_REPO`, `IMAGE_TAG` (per-image, same tag)   |
 
-#### `ROSA_REGIONAL_EXTRA_COMPONENTS` for ZOA
+#### `ROSA_REGIONAL_COMPONENTS` for ZOA
 
-ZOA uses the same `ROSA_REGIONAL_EXTRA_COMPONENTS` mechanism as the API repo but targets
+ZOA uses the same `ROSA_REGIONAL_COMPONENTS` mechanism as other ephemeral-e2e consumers but targets
 `config/defaults.yaml` (Terraform) instead of ArgoCD Helm values files:
 
 ```yaml
-ROSA_REGIONAL_EXTRA_COMPONENTS: |
-  - image: CI_ZOA_LAMBDA_IMAGE
+ROSA_REGIONAL_COMPONENTS: |
+  - image: CI_IMAGE_1
     repo: quay.io/rrp-dev-ci/zoa-lambda
     target: config/defaults.yaml
     override:
       regional_cluster:
         zoa_lambda_image_tag: IMAGE_TAG
         zoa_lambda_source_image: IMAGE_REPO
-  - image: CI_ZOA_RUNNER_IMAGE
+  - image: CI_IMAGE_2
     repo: quay.io/rrp-dev-ci/zoa-runner
     target: config/defaults.yaml
     override:
       regional_cluster:
         zoa_runner_image_tag: IMAGE_TAG
         zoa_runner_source_image: IMAGE_REPO
+  - image: CI_IMAGE_3
+    repo: quay.io/rrp-dev-ci/zoa-boundary
+    target: config/defaults.yaml
+    override:
+      regional_cluster:
+        zoa_boundary_image_tag: IMAGE_TAG
+        zoa_boundary_source_image: IMAGE_REPO
 ```
 
-Both entries target the same file (`config/defaults.yaml`) — the provision step applies them
+All three entries target the same file (`config/defaults.yaml`) — the provision step applies them
 sequentially via deep-merge. The ephemeral provider then runs `render.py`, which regenerates
 `deploy/.../terraform.json` with the CI-built image tags. Terraform picks them up during
 provisioning.

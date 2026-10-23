@@ -17,9 +17,12 @@
 deployment_name: "{{ aws_region }}{% if eph_prefix %}-{{ eph_prefix }}{% endif %}"
 
 # ZOA Access invoker trust: explicit Central Account role names only (no repo-wide default).
+# Dev ephemeral central is rrp-dev-control (791666871613). SAML operators use the
+# account-prefixed IAM role from app-interface (rosa-seaplane-zoa-operator-dev).
 aws:
   zoa_access_trusted_assumer_role_names:
     - OrganizationAccountAccessRole
+    - 791666871613-rosa-seaplane-zoa-operator-dev
 
 dns:
   domain: "{% if ci %}ci00{% else %}dev0{% endif %}.rosa.devshift.net"
