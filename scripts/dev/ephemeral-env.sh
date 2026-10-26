@@ -1226,6 +1226,7 @@ cmd_zoa_e2e() {
 
     $CONTAINER_ENGINE run --rm \
         $_CONTAINER_AWS_FLAGS \
+        -e "BUILD_ID=$BUILD_ID" \
         -e "ZOA_RC_API_URL=$zoa_rc_api_url" \
         -e "ZOA_MC_API_URL=$zoa_mc_api_url" \
         -e "RHOBS_API_URL=$rhobs_api_url" \
