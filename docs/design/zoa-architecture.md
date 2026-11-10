@@ -23,11 +23,11 @@ ZOA is independent of the Regional Cluster's Platform API or any Kubernetes work
 
 Production work is **boundary-first**: every path begins on the laptop with session management, continues in an ephemeral **boundary** task (ECS Exec), and uses **Trusted Actions** for reads and changes to fleet state. There is no supported workflow that grants standing cluster credentials on the laptop.
 
-| Pillar              | Status  | Platform role                                                                                                                                                                                            |
-| ------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Boundary**        | Shipped | Audited entry point — `zoa session start` / join; tools and shell in target VPC                                                                                                                          |
-| **Trusted Actions** | Shipped | Declarative, RBAC-scoped operations via `zoa run` **from inside the boundary**                                                                                                                           |
-| **Break-glass**     | Planned | Scoped emergency `kubectl` / AWS from the boundary — not implemented; see [break-glass stub](https://github.com/openshift-online/rosa-seaplane-zoa/blob/main/docs/break-glass/README.md) in the ZOA repo |
+| Pillar              | Status  | Platform role                                                                                                                                                                                                                                                                       |
+| ------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Boundary**        | Shipped | Audited entry point — `zoa session start` / join; tools and shell in target VPC                                                                                                                                                                                                     |
+| **Trusted Actions** | Shipped | Declarative, RBAC-scoped operations via `zoa run` **from inside the boundary**                                                                                                                                                                                                      |
+| **Break-glass**     | Planned | Scoped emergency `kubectl` / AWS from the boundary — not implemented; draft [zoa-break-glass-proposal.md](./zoa-break-glass-proposal.md); implementation hub [docs/break-glass/](https://github.com/openshift-online/rosa-seaplane-zoa/blob/main/docs/break-glass/) in the ZOA repo |
 
 **Session path** (operator access): laptop → **Access** Lambda → boundary ECS → optional **TA path** below.
 
