@@ -60,9 +60,9 @@ locals {
       SESSION_STALE_CREATING_SECONDS = tostring(var.session_stale_creating_seconds)
     } : {},
     var.breakglass_table_name != "" ? {
-      BREAKGLASS_TABLE                = var.breakglass_table_name
-      BREAKGLASS_AWS_READ_ROLE_ARN    = aws_iam_role.zoa_bg_aws_read.arn
-      BREAKGLASS_AWS_WRITE_ROLE_ARN   = aws_iam_role.zoa_bg_aws_write.arn
+      BREAKGLASS_TABLE                 = var.breakglass_table_name
+      BREAKGLASS_AWS_READ_ROLE_ARN     = aws_iam_role.zoa_bg_aws_read.arn
+      BREAKGLASS_AWS_WRITE_ROLE_ARN    = aws_iam_role.zoa_bg_aws_write.arn
       BREAKGLASS_AWS_ELEVATED_ROLE_ARN = aws_iam_role.zoa_bg_aws_elevated.arn
     } : {},
   )

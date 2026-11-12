@@ -243,7 +243,7 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
         Resource = concat([
           "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.sessions_table_name}",
           "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.sessions_table_name}/index/*",
-        ], var.breakglass_table_name != "" ? [
+          ], var.breakglass_table_name != "" ? [
           "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.breakglass_table_name}",
           "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.breakglass_table_name}/index/*",
         ] : [])

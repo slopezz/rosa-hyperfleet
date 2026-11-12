@@ -59,6 +59,27 @@ tests:
           - labels: 'zoa:access_availability{cluster="rc-01"}'
             value: 0.9
 
+  # Break-glass API availability: 18/20 = 0.9 on breakglass routes only
+  - interval: 1m
+    input_series:
+      - series: 'aws_zoa_http_request_count_sum{cluster="mc-01",dimension_HandlerMode="api",dimension_RouteTemplate="GET /api/v0/breakglass/scopes",dimension_StatusClass="2xx"}'
+        values: "10x10"
+      - series: 'aws_zoa_http_request_count_sum{cluster="mc-01",dimension_HandlerMode="api",dimension_RouteTemplate="POST /api/v0/breakglass/requests",dimension_StatusClass="2xx"}'
+        values: "8x10"
+      - series: 'aws_zoa_http_request_count_sum{cluster="mc-01",dimension_HandlerMode="api",dimension_RouteTemplate="POST /api/v0/breakglass/requests",dimension_StatusClass="5xx"}'
+        values: "2x10"
+    promql_expr_test:
+      - expr: zoa:breakglass_api_availability{cluster="mc-01"}
+        eval_time: 5m
+        exp_samples:
+          - labels: 'zoa:breakglass_api_availability{cluster="mc-01"}'
+            value: 0.9
+      - expr: zoa:breakglass_request_volume{cluster="mc-01"}
+        eval_time: 5m
+        exp_samples:
+          - labels: 'zoa:breakglass_request_volume{cluster="mc-01"}'
+            value: 10
+
   # Lambda combined recording rules (api+worker per tag_Cluster; Access folded in).
   # errors 12, inv 200 → error_rate 6%; throttles 10 → throttle_rate 5%.
   - interval: 1m

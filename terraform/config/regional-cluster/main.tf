@@ -619,9 +619,9 @@ module "zoa_lambda" {
   sessions_table_name   = module.zoa.sessions_table_name
   breakglass_table_name = module.zoa.breakglass_table_name
   deployment_name       = var.deployment_name
-  targets_ssm_prefix  = "/zoa/targets/${var.deployment_name}"
-  vpc_id              = module.regional_cluster.vpc_id
-  boundary_image      = var.zoa_boundary_image
+  targets_ssm_prefix    = "/zoa/targets/${var.deployment_name}"
+  vpc_id                = module.regional_cluster.vpc_id
+  boundary_image        = var.zoa_boundary_image
 
   session_idle_timeout_seconds   = var.zoa_boundary_session_idle_timeout_seconds
   session_stale_creating_seconds = var.zoa_boundary_session_stale_creating_seconds
