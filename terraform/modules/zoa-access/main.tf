@@ -77,10 +77,9 @@ resource "aws_lambda_function" "access" {
   reserved_concurrent_executions = var.lambda_access_concurrency
 
   environment {
-    variables = {
+    variables = merge({
       HANDLER_MODE                     = "access"
       SESSIONS_TABLE                   = var.sessions_table_name
-      BREAKGLASS_TABLE                 = var.breakglass_table_name
       TARGETS_SSM_PREFIX               = var.targets_ssm_prefix
       AUDIT_TABLE                      = var.audit_table_name
       KMS_KEY_ARN                      = var.kms_key_arn
@@ -90,7 +89,10 @@ resource "aws_lambda_function" "access" {
       EXEC_CREDENTIAL_DURATION_SECONDS = "3600"
       SESSION_MAX_DURATION_HOURS       = tostring(var.session_max_duration_hours)
       SESSION_IDLE_TIMEOUT_SECONDS     = tostring(var.session_idle_timeout_seconds)
-    }
+      }, var.breakglass_table_name != "" ? {
+      BREAKGLASS_TABLE = var.breakglass_table_name
+      } : {},
+    )
   }
 
   tags = merge(local.common_tags, {
@@ -229,37 +231,52 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "SessionsReadWrite"
-        Effect = "Allow"
-        Action = [
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:UpdateItem",
-          "dynamodb:Query",
-          "dynamodb:DescribeTable",
-        ]
-        Resource = concat([
-          "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.sessions_table_name}",
-          "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.sessions_table_name}/index/*",
-          ], var.breakglass_table_name != "" ? [
-          "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.breakglass_table_name}",
-          "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.breakglass_table_name}/index/*",
-        ] : [])
-      },
-      # Targets read via SSM (see lambda_ssm policy below)
-      {
-        Sid    = "AuditWrite"
-        Effect = "Allow"
-        Action = [
-          "dynamodb:PutItem",
-        ]
-        Resource = [
-          "arn:aws:dynamodb:${data.aws_region.current.region}:*:table/${var.audit_table_name}",
-        ]
-      },
-    ]
+    Statement = concat(
+      [
+        {
+          Sid    = "SessionsReadWrite"
+          Effect = "Allow"
+          Action = [
+            "dynamodb:GetItem",
+            "dynamodb:PutItem",
+            "dynamodb:UpdateItem",
+            "dynamodb:Query",
+            "dynamodb:DescribeTable",
+          ]
+          Resource = [
+            "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.sessions_table_name}",
+            "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.sessions_table_name}/index/*",
+          ]
+        },
+        {
+          Sid    = "AuditWrite"
+          Effect = "Allow"
+          Action = [
+            "dynamodb:PutItem",
+          ]
+          Resource = [
+            "arn:aws:dynamodb:${data.aws_region.current.region}:*:table/${var.audit_table_name}",
+          ]
+        },
+      ],
+      var.breakglass_table_name != "" ? [
+        {
+          Sid    = "BreakglassReadWrite"
+          Effect = "Allow"
+          Action = [
+            "dynamodb:GetItem",
+            "dynamodb:PutItem",
+            "dynamodb:UpdateItem",
+            "dynamodb:Query",
+            "dynamodb:DescribeTable",
+          ]
+          Resource = [
+            "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.breakglass_table_name}",
+            "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.breakglass_table_name}/index/*",
+          ]
+        },
+      ] : [],
+    )
   })
 }
 
