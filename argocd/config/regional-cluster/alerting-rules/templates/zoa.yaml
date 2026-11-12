@@ -160,20 +160,6 @@ spec:
             sum by (cluster) (aws_zoa_identity_bridge_lookup_sum{dimension_Outcome="hit"})
             / sum by (cluster) (aws_zoa_identity_bridge_lookup_sum{dimension_Outcome=~"hit|miss|error"})
 
-        # Break-glass plane SLI: API routes under /api/v0/breakglass (RouteTemplate from pkg/metrics).
-        - record: zoa:breakglass_api_availability
-          expr: |
-            (
-              sum by (cluster) (aws_zoa_http_request_count_sum{dimension_HandlerMode="api", dimension_RouteTemplate=~".*breakglass.*", dimension_StatusClass="2xx"})
-              +
-              (0 * group by (cluster) (aws_zoa_http_request_count_sum{dimension_HandlerMode="api", dimension_RouteTemplate=~".*breakglass.*"}))
-            )
-            / sum by (cluster) (aws_zoa_http_request_count_sum{dimension_HandlerMode="api", dimension_RouteTemplate=~".*breakglass.*"})
-
-        - record: zoa:breakglass_request_volume
-          expr: |
-            sum by (cluster) (aws_zoa_http_request_count_sum{dimension_HandlerMode="api", dimension_RouteTemplate=~"POST /api/v0/breakglass/requests"})
-
     - name: zoa-alerts
       rules:
         # ──────────────────────────────────────────────────────────────
@@ -410,27 +396,6 @@ spec:
               3. If a single action is failing: check that action RBAC, timeout, and target resource availability.
               4. If many actions fail: likely a shared dependency issue, see ZOAExecutionsTotalFailure runbook.
               5. Alert auto-recovers when success rate rises above {{ .Values.sla.zoa.taSuccessRate.target }}.
-
-        # Break-glass API (request / connect / scopes). Warning only — low traffic until adoption.
-        - alert: ZOABreakglassApiAvailabilityBelowSLO
-          expr: |
-            (zoa:breakglass_api_availability < {{ .Values.sla.zoa.apiAvailability.target }})
-            and
-            (sum by (cluster) (aws_zoa_http_request_count_sum{dimension_HandlerMode="api", dimension_RouteTemplate=~".*breakglass.*"}) > 5)
-          for: 15m
-          labels:
-            severity: warning
-          annotations:
-            summary: ZOA break-glass API availability below SLO
-            description: >-
-              ZOA break-glass HTTP on cluster {{ "{{" }} $labels.cluster {{ "}}" }} availability is
-              {{ "{{" }} $value | humanizePercentage {{ "}}" }}
-              (target {{ .Values.sla.zoa.apiAvailability.target }}) for 15m.
-            runbook: >-
-              1. Open ZOA dashboard → filter RouteTemplate containing breakglass.
-              2. Check BREAKGLASS_TABLE and break-glass IAM roles on API Lambda; connect failures often indicate STS or kube RBAC issues.
-              3. Correlate with ZOADynamoDBThrottled if requests fail at create/approve.
-              4. Alert auto-recovers when availability rises above {{ .Values.sla.zoa.apiAvailability.target }}.
 
         # Combined ZOA Lambda throttle rate (api + worker + Access per cluster).
         # Same traffic guard as error rate; for: 20m requires sustained throttle pressure.
