@@ -35,10 +35,6 @@ resource "aws_ecs_task_definition" "boundary" {
           value = data.aws_region.current.region
         },
         {
-          name  = "ZOA_BREAKGLASS_ROLE_ARN"
-          value = ""
-        },
-        {
           name  = "HOME"
           value = "/home/sre"
         },
@@ -239,18 +235,3 @@ resource "aws_iam_role_policy" "task_bedrock" {
   })
 }
 
-resource "aws_iam_role_policy" "task_breakglass" {
-  count = length(var.breakglass_role_arns) > 0 ? 1 : 0
-  name  = "breakglass-assume-role"
-  role  = aws_iam_role.task.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Sid      = "BreakglassAssumeRole"
-      Effect   = "Allow"
-      Action   = "sts:AssumeRole"
-      Resource = var.breakglass_role_arns
-    }]
-  })
-}

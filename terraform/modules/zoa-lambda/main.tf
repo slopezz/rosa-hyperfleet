@@ -58,7 +58,14 @@ locals {
       SESSIONS_TABLE                 = var.sessions_table_name
       SESSION_IDLE_TIMEOUT_SECONDS   = tostring(var.session_idle_timeout_seconds)
       SESSION_STALE_CREATING_SECONDS = tostring(var.session_stale_creating_seconds)
-  } : {})
+    } : {},
+    var.breakglass_table_name != "" ? {
+      BREAKGLASS_TABLE                = var.breakglass_table_name
+      BREAKGLASS_AWS_READ_ROLE_ARN    = aws_iam_role.zoa_bg_aws_read.arn
+      BREAKGLASS_AWS_WRITE_ROLE_ARN   = aws_iam_role.zoa_bg_aws_write.arn
+      BREAKGLASS_AWS_ELEVATED_ROLE_ARN = aws_iam_role.zoa_bg_aws_elevated.arn
+    } : {},
+  )
 
   common_tags = {
     Component = "zoa"
@@ -129,6 +136,10 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
         var.sessions_table_name != "" ? [
           "arn:aws:dynamodb:${data.aws_region.current.region}:*:table/${var.sessions_table_name}",
           "arn:aws:dynamodb:${data.aws_region.current.region}:*:table/${var.sessions_table_name}/index/*",
+        ] : [],
+        var.breakglass_table_name != "" ? [
+          "arn:aws:dynamodb:${data.aws_region.current.region}:*:table/${var.breakglass_table_name}",
+          "arn:aws:dynamodb:${data.aws_region.current.region}:*:table/${var.breakglass_table_name}/index/*",
         ] : [],
       )
     }]
@@ -214,6 +225,9 @@ resource "aws_iam_role_policy" "lambda_sts" {
         var.uploader_role_arn,
         aws_iam_role.zoa_aws_read.arn,
         aws_iam_role.zoa_aws_write.arn,
+        aws_iam_role.zoa_bg_aws_read.arn,
+        aws_iam_role.zoa_bg_aws_write.arn,
+        aws_iam_role.zoa_bg_aws_elevated.arn,
         var.data_access_role_arn,
       ])
     }]

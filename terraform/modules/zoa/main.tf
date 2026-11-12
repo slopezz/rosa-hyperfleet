@@ -1,7 +1,8 @@
 locals {
   table_name          = "${var.regional_id}-zoa-executions"
   audit_table_name    = "${var.regional_id}-zoa-audit-log"
-  sessions_table_name = "${var.regional_id}-zoa-boundary-sessions"
+  sessions_table_name   = "${var.regional_id}-zoa-boundary-sessions"
+  breakglass_table_name = "${var.regional_id}-zoa-breakglass"
   bucket_name         = "${var.regional_id}-zoa-outputs-${data.aws_caller_identity.current.account_id}"
   kms_alias           = "alias/${var.regional_id}-zoa"
 

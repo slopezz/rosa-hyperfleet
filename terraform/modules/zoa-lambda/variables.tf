@@ -231,6 +231,12 @@ variable "sessions_table_name" {
   default     = ""
 }
 
+variable "breakglass_table_name" {
+  description = "DynamoDB table name for ZOA break-glass requests. Enables BREAKGLASS_TABLE on API and worker Lambdas."
+  type        = string
+  default     = ""
+}
+
 variable "session_idle_timeout_seconds" {
   description = "Idle window (seconds) before the Worker idle reaper stops an active boundary session (SESSION_IDLE_TIMEOUT_SECONDS). Used when sessions_table_name is set. Stale creating uses session_stale_creating_seconds."
   type        = number
@@ -326,7 +332,7 @@ variable "claude_code_bedrock_primary_model" {
 }
 
 variable "breakglass_role_arns" {
-  description = "IAM role ARNs the boundary task role may assume for break-glass access."
+  description = "Deprecated — break-glass STS is API Lambda only (empty list)."
   type        = list(string)
   default     = []
 }

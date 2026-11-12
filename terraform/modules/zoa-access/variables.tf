@@ -21,6 +21,12 @@ variable "sessions_table_name" {
   default     = "boundary-sessions"
 }
 
+variable "breakglass_table_name" {
+  description = "DynamoDB table for ZOA break-glass requests (laptop approve/reject)."
+  type        = string
+  default     = ""
+}
+
 variable "targets_ssm_prefix" {
   description = "SSM path prefix for target registration (e.g., /zoa/targets/us-east-1). Each cluster writes its own parameter under this prefix."
   type        = string

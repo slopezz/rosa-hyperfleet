@@ -616,8 +616,9 @@ module "zoa_lambda" {
   seaplane_db_username = local.zoa_db_reader_username
 
   # Boundary integration — use deployment_name (e.g. us-east-1-eph-xxx), not regional_id.
-  sessions_table_name = module.zoa.sessions_table_name
-  deployment_name     = var.deployment_name
+  sessions_table_name   = module.zoa.sessions_table_name
+  breakglass_table_name = module.zoa.breakglass_table_name
+  deployment_name       = var.deployment_name
   targets_ssm_prefix  = "/zoa/targets/${var.deployment_name}"
   vpc_id              = module.regional_cluster.vpc_id
   boundary_image      = var.zoa_boundary_image
@@ -654,6 +655,7 @@ module "zoa_access" {
   mc_account_ids = local.mc_account_ids
 
   sessions_table_name                 = module.zoa.sessions_table_name
+  breakglass_table_name               = module.zoa.breakglass_table_name
   audit_table_name                    = module.zoa.audit_table_name
   targets_ssm_prefix                  = "/zoa/targets/${var.deployment_name}"
   kms_key_arn                         = module.zoa.kms_key_arn

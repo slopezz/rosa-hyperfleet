@@ -162,6 +162,8 @@ resource "aws_iam_role_policy" "data_access_dynamodb" {
         "${aws_dynamodb_table.audit_log.arn}/index/*",
         aws_dynamodb_table.boundary_sessions.arn,
         "${aws_dynamodb_table.boundary_sessions.arn}/index/*",
+        aws_dynamodb_table.breakglass.arn,
+        "${aws_dynamodb_table.breakglass.arn}/index/*",
       ]
     }]
   })

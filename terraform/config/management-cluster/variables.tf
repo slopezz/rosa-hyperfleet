@@ -257,6 +257,12 @@ variable "zoa_sessions_table_name" {
   default     = ""
 }
 
+variable "zoa_breakglass_table_name" {
+  description = "DynamoDB table name for ZOA break-glass requests (in RC account, read from RC state)."
+  type        = string
+  default     = ""
+}
+
 variable "zoa_deployment_name" {
   description = "ZOA logical deployment name (same as RC deployment_name). Boundary ECS env; MC SSM registration uses deploy JSON in provision-mc-zoa-target-ssm.sh."
   type        = string

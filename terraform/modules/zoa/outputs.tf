@@ -63,6 +63,11 @@ output "sessions_table_name" {
   value       = aws_dynamodb_table.boundary_sessions.name
 }
 
+output "breakglass_table_name" {
+  description = "DynamoDB table name for ZOA break-glass requests"
+  value       = aws_dynamodb_table.breakglass.name
+}
+
 # Target registration uses SSM Parameter Store, not DynamoDB.
 # Each cluster's Terraform writes /zoa/targets/<deployment>/<cluster>.
 # No table output needed — Access Lambda reads SSM with ambient creds.

@@ -289,6 +289,71 @@ resource "aws_dynamodb_table" "boundary_sessions" {
 }
 
 # =============================================================================
+# DynamoDB Table for ZOA Break-Glass
+# =============================================================================
+# Stores break-glass request/grant lifecycle (pending_approval → approved → expired).
+# PK: requestId. GSIs mirror executions: target-status-index (worker expiry),
+# date-bucket-index (operator list/history).
+
+resource "aws_dynamodb_table" "breakglass" {
+  name                        = local.breakglass_table_name
+  billing_mode                = var.billing_mode
+  hash_key                    = "requestId"
+  deletion_protection_enabled = var.dynamodb_deletion_protection
+
+  attribute {
+    name = "requestId"
+    type = "S"
+  }
+  attribute {
+    name = "createdAt"
+    type = "S"
+  }
+  attribute {
+    name = "dateBucket"
+    type = "S"
+  }
+  attribute {
+    name = "targetCluster"
+    type = "S"
+  }
+  attribute {
+    name = "targetStatusKey"
+    type = "S"
+  }
+
+  global_secondary_index {
+    name            = "target-status-index"
+    hash_key        = "targetCluster"
+    range_key       = "targetStatusKey"
+    projection_type = "ALL"
+  }
+
+  global_secondary_index {
+    name            = "date-bucket-index"
+    hash_key        = "dateBucket"
+    range_key       = "createdAt"
+    projection_type = "ALL"
+  }
+
+  ttl {
+    attribute_name = "ttl"
+    enabled        = true
+  }
+
+  point_in_time_recovery {
+    enabled = var.environment != "ephemeral"
+  }
+
+  server_side_encryption {
+    enabled     = true
+    kms_key_arn = aws_kms_key.zoa.arn
+  }
+
+  tags = merge(local.common_tags, { Name = local.breakglass_table_name, Component = "zoa" })
+}
+
+# =============================================================================
 # ZOA Boundary Targets — SSM Parameter Store
 # =============================================================================
 # Target registration uses SSM Parameter Store instead of DynamoDB because

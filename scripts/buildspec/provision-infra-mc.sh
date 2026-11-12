@@ -121,6 +121,7 @@ else
         zoa_table_name
         zoa_audit_table_name
         zoa_sessions_table_name
+        zoa_breakglass_table_name
         zoa_uploader_role_arn
         zoa_data_access_role_arn
         zoa_access_lambda_role_arn
@@ -157,6 +158,9 @@ else
     TF_VAR_zoa_sessions_table_name=$(tf_read_output "$_RC_TF_DIR" zoa_sessions_table_name)
     export TF_VAR_zoa_sessions_table_name
 
+    TF_VAR_zoa_breakglass_table_name=$(tf_read_output "$_RC_TF_DIR" zoa_breakglass_table_name)
+    export TF_VAR_zoa_breakglass_table_name
+
     TF_VAR_zoa_access_lambda_role_arn=$(tf_read_output "$_RC_TF_DIR" zoa_access_lambda_role_arn '^arn:')
     export TF_VAR_zoa_access_lambda_role_arn
 
@@ -186,7 +190,7 @@ else
         "${OIDC_KEY_READER_ROLE_ARN}" "${RESOLVED_REGIONAL_ACCOUNT_ID}"
     require_nonempty_vars "MC ZOA RC dependency" \
         TF_VAR_zoa_outputs_bucket_arn TF_VAR_zoa_kms_key_arn \
-        TF_VAR_zoa_table_name TF_VAR_zoa_audit_table_name TF_VAR_zoa_sessions_table_name \
+        TF_VAR_zoa_table_name TF_VAR_zoa_audit_table_name TF_VAR_zoa_sessions_table_name TF_VAR_zoa_breakglass_table_name \
         TF_VAR_zoa_uploader_role_arn TF_VAR_zoa_data_access_role_arn \
         TF_VAR_zoa_access_lambda_role_arn TF_VAR_zoa_lambda_ecr_url
     validate_arn_account "TF_VAR_zoa_kms_key_arn" \

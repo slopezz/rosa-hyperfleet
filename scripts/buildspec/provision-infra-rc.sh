@@ -236,6 +236,7 @@ if [[ "${TERRAFORM_ACTION}" == "apply" ]]; then
         "zoa_table_name"
         "zoa_audit_table_name"
         "zoa_sessions_table_name"
+        "zoa_breakglass_table_name"
         "zoa_uploader_role_arn|^arn:"
         "zoa_data_access_role_arn|^arn:"
         "zoa_access_lambda_role_arn|^arn:"

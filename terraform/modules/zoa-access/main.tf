@@ -80,6 +80,7 @@ resource "aws_lambda_function" "access" {
     variables = {
       HANDLER_MODE                     = "access"
       SESSIONS_TABLE                   = var.sessions_table_name
+      BREAKGLASS_TABLE                 = var.breakglass_table_name
       TARGETS_SSM_PREFIX               = var.targets_ssm_prefix
       AUDIT_TABLE                      = var.audit_table_name
       KMS_KEY_ARN                      = var.kms_key_arn
@@ -239,10 +240,13 @@ resource "aws_iam_role_policy" "lambda_dynamodb" {
           "dynamodb:Query",
           "dynamodb:DescribeTable",
         ]
-        Resource = [
+        Resource = concat([
           "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.sessions_table_name}",
           "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.sessions_table_name}/index/*",
-        ]
+        ], var.breakglass_table_name != "" ? [
+          "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.breakglass_table_name}",
+          "arn:aws:dynamodb:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:table/${var.breakglass_table_name}/index/*",
+        ] : [])
       },
       # Targets read via SSM (see lambda_ssm policy below)
       {
