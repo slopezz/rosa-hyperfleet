@@ -1,7 +1,12 @@
 # Break-glass AWS roles — assumed by API Lambda only (not boundary task role).
 
+locals {
+  enable_breakglass = var.breakglass_table_name != ""
+}
+
 resource "aws_iam_role" "zoa_bg_aws_read" {
-  name = "${local.function_prefix}-bg-aws-read"
+  count = local.enable_breakglass ? 1 : 0
+  name  = "${local.function_prefix}-bg-aws-read"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -16,8 +21,9 @@ resource "aws_iam_role" "zoa_bg_aws_read" {
 }
 
 resource "aws_iam_role_policy" "zoa_bg_aws_read" {
-  name = "breakglass-read"
-  role = aws_iam_role.zoa_bg_aws_read.id
+  count = local.enable_breakglass ? 1 : 0
+  name  = "breakglass-read"
+  role  = aws_iam_role.zoa_bg_aws_read[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -41,7 +47,8 @@ resource "aws_iam_role_policy" "zoa_bg_aws_read" {
 }
 
 resource "aws_iam_role" "zoa_bg_aws_write" {
-  name = "${local.function_prefix}-bg-aws-write"
+  count = local.enable_breakglass ? 1 : 0
+  name  = "${local.function_prefix}-bg-aws-write"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -56,8 +63,9 @@ resource "aws_iam_role" "zoa_bg_aws_write" {
 }
 
 resource "aws_iam_role_policy" "zoa_bg_aws_write" {
-  name = "breakglass-write"
-  role = aws_iam_role.zoa_bg_aws_write.id
+  count = local.enable_breakglass ? 1 : 0
+  name  = "breakglass-write"
+  role  = aws_iam_role.zoa_bg_aws_write[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -70,7 +78,8 @@ resource "aws_iam_role_policy" "zoa_bg_aws_write" {
 }
 
 resource "aws_iam_role" "zoa_bg_aws_elevated" {
-  name = "${local.function_prefix}-bg-aws-elevated"
+  count = local.enable_breakglass ? 1 : 0
+  name  = "${local.function_prefix}-bg-aws-elevated"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -86,8 +95,9 @@ resource "aws_iam_role" "zoa_bg_aws_elevated" {
 
 # Elevated scoped mutations — no AdministratorAccess.
 resource "aws_iam_role_policy" "zoa_bg_aws_elevated" {
-  name = "breakglass-elevated"
-  role = aws_iam_role.zoa_bg_aws_elevated.id
+  count = local.enable_breakglass ? 1 : 0
+  name  = "breakglass-elevated"
+  role  = aws_iam_role.zoa_bg_aws_elevated[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"

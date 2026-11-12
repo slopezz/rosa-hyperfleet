@@ -331,8 +331,3 @@ variable "claude_code_bedrock_primary_model" {
   default     = "us.anthropic.claude-sonnet-5"
 }
 
-variable "breakglass_role_arns" {
-  description = "Deprecated — break-glass STS is API Lambda only (empty list)."
-  type        = list(string)
-  default     = []
-}

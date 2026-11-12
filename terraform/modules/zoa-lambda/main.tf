@@ -61,9 +61,9 @@ locals {
     } : {},
     var.breakglass_table_name != "" ? {
       BREAKGLASS_TABLE                 = var.breakglass_table_name
-      BREAKGLASS_AWS_READ_ROLE_ARN     = aws_iam_role.zoa_bg_aws_read.arn
-      BREAKGLASS_AWS_WRITE_ROLE_ARN    = aws_iam_role.zoa_bg_aws_write.arn
-      BREAKGLASS_AWS_ELEVATED_ROLE_ARN = aws_iam_role.zoa_bg_aws_elevated.arn
+      BREAKGLASS_AWS_READ_ROLE_ARN     = aws_iam_role.zoa_bg_aws_read[0].arn
+      BREAKGLASS_AWS_WRITE_ROLE_ARN    = aws_iam_role.zoa_bg_aws_write[0].arn
+      BREAKGLASS_AWS_ELEVATED_ROLE_ARN = aws_iam_role.zoa_bg_aws_elevated[0].arn
     } : {},
   )
 
@@ -221,15 +221,19 @@ resource "aws_iam_role_policy" "lambda_sts" {
     Statement = [{
       Effect = "Allow"
       Action = "sts:AssumeRole"
-      Resource = compact([
-        var.uploader_role_arn,
-        aws_iam_role.zoa_aws_read.arn,
-        aws_iam_role.zoa_aws_write.arn,
-        aws_iam_role.zoa_bg_aws_read.arn,
-        aws_iam_role.zoa_bg_aws_write.arn,
-        aws_iam_role.zoa_bg_aws_elevated.arn,
-        var.data_access_role_arn,
-      ])
+      Resource = compact(concat(
+        [
+          var.uploader_role_arn,
+          aws_iam_role.zoa_aws_read.arn,
+          aws_iam_role.zoa_aws_write.arn,
+          var.data_access_role_arn,
+        ],
+        local.enable_breakglass ? [
+          aws_iam_role.zoa_bg_aws_read[0].arn,
+          aws_iam_role.zoa_bg_aws_write[0].arn,
+          aws_iam_role.zoa_bg_aws_elevated[0].arn,
+        ] : [],
+      ))
     }]
   })
 }
