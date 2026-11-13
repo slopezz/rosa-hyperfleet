@@ -1,5 +1,7 @@
 # ZOA Break-Glass — Feature Proposal
 
+> **Stale scratch copy.** Not linked from architecture docs. Canonical operator and approval docs live in [rosa-seaplane-zoa](https://github.com/openshift-online/rosa-seaplane-zoa/blob/main/docs/break-glass/README.md) (`approval-workflow.md` + code).
+
 **Status:** Draft for review (HyperFleet / ZOA)  
 **Audience:** Engineering, security, SRE  
 **Repos:** `rosa-hyperfleet-zoa` (API, CLI, worker), `rosa-hyperfleet` (Terraform, observability)
